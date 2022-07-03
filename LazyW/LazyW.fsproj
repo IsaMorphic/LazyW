@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="LazyW.fs" />
+    <Compile Include="Streams.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
