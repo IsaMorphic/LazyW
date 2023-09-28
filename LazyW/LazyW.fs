@@ -35,11 +35,13 @@ let rec lzwDecompress (dict : Map<uint, seq<byte>>) (ints : seq<uint>) =
             if nextInt < (uint dict.Count) then
                 let w = dict.Item nextInt;
                 let nextStr = w |> Seq.head |> Seq.singleton |> Seq.append prev
-                w, (if dict.Count < 4096 && not (prev |> Seq.isEmpty) then 
+                w, (
+                if dict.Count < 4096 && not (prev |> Seq.isEmpty) then 
                     dict.Add (uint dict.Count, nextStr) else dict)
             else
                 let v = prev |> Seq.head |> Seq.singleton |> Seq.append prev
-                v, (if dict.Count < 4096 then 
+                v, (
+                if dict.Count < 4096 then 
                     dict.Add (uint dict.Count, v) else dict)
         ) (Seq.empty, dict) ints |> Seq.collect fst
 
@@ -66,13 +68,9 @@ let unpackInts (bytes : seq<byte>) =
     |> Seq.concat
 
 let compress stream = 
-    let rDict = [| 0u .. 255u |] |> 
-        Array.map (fun x -> (x |> char |> string, x)) |>
-        Map.ofArray
+    let rDict = [| 0u .. 255u |] |> Array.map (fun x -> (x |> char |> string, x)) |> Map.ofArray
     stream |> lzwCompress rDict 0 |> packInts
 
 let decompress bytes =
-    let wDict = [| 0u .. 255u |] |> 
-        Array.map (fun x -> (x, x |> byte |> Seq.singleton)) |>
-        Map.ofArray
+    let wDict = [| 0u .. 255u |] |> Array.map (fun x -> (x, x |> byte |> Seq.singleton)) |> Map.ofArray
     bytes |> unpackInts |> lzwDecompress wDict
